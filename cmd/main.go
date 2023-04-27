@@ -2,13 +2,18 @@ package main
 
 import (
 	"database/sql"
+	"define-komandy/internal/app"
 	"define-komandy/internal/service"
+	"define-komandy/internal/structs"
+	"github.com/gin-gonic/gin"
 	"log"
 )
 
+var DB *sql.DB
+
 func main() {
-	db := service.ConnectDB()
-	err := db.Ping()
+	DB = service.ConnectDB()
+	err := DB.Ping()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -17,8 +22,12 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-	}(db)
+	}(DB)
+	app.DB = DB
+	r := gin.Default()
 
-	//testing-only:
-	//service.DBFill(db)
+	err = r.Run(service.First(service.ReadYaml[structs.Config]("/config/config.yaml")).Host)
+	if err != nil {
+		log.Fatal(err)
+	}
 }

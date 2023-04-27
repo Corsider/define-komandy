@@ -9,11 +9,11 @@ import (
 )
 
 func ConnectDB() *sql.DB {
-	data, err := readYaml[structs.Config]("/config/config.yaml")
+	data, err := ReadYaml[structs.Config]("/config/config.yaml")
 	if err != nil {
 		log.Fatal(err)
 	}
-	secret, err := readYaml[structs.SecretConfig]("/config/secret.yaml")
+	secret, err := ReadYaml[structs.SecretConfig]("/config/secret.yaml")
 	if err != nil {
 		log.Fatal(err)
 	}

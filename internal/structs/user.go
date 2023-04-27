@@ -10,5 +10,4 @@ type User struct {
 	Tags        []int   `db:"tags"`
 	Mail        string  `db:"mail"`
 	Password    string  `db:"password"`
-	Salt        string  `db:"salt"`
 }

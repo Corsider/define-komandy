@@ -8,7 +8,7 @@ import (
 	"os"
 )
 
-func readYaml[T structs.Config | structs.SecretConfig](filename string) (*T, error) {
+func ReadYaml[T structs.Config | structs.SecretConfig](filename string) (*T, error) {
 	d, _ := os.Getwd()
 	buf, err := os.ReadFile(d + filename)
 	if err != nil {
