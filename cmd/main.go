@@ -24,7 +24,10 @@ func main() {
 		}
 	}(DB)
 	app.DB = DB
+
 	r := gin.Default()
+
+	app.InitRouters(r)
 
 	err = r.Run(service.First(service.ReadYaml[structs.Config]("/config/config.yaml")).Host)
 	if err != nil {

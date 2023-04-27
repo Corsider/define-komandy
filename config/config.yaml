@@ -1,4 +1,4 @@
 host: "127.0.0.1:8080"
-dbName: "postgres"
+dbName: "define_teams_DB"
 dbAddr: ""
 #define_teams_DB
