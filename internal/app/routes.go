@@ -23,7 +23,7 @@ func CreateUser(c *gin.Context) {
 	region := c.Query("region")
 	mail := c.Query("mail")
 
-	query := fmt.Sprintf("SELECT nickname FROM users WHERE nickname=%s OR mail=%s", nickname, mail)
+	query := fmt.Sprintf("SELECT nickname FROM users WHERE nickname='%s' OR mail='%s'", nickname, mail)
 	rows, err := DB.Query(query)
 	if err != nil {
 		log.Println(err)
@@ -39,18 +39,19 @@ func CreateUser(c *gin.Context) {
 			"server": 0,
 		})
 	} else {
-		str := fmt.Sprintf("\\'%s\\' \\'%s\\' %d \\'%s\\' \\'%s\\' \\'%s\\' \\'%s\\' \\'%s\\' \\'%s\\' \\'%s\\' \\'%s\\'",
+		str := fmt.Sprintf("'%s', '%s', %d, '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s'",
 			name, nickname, 0, description, "{}", "", "", region, "{}", mail, HashPassword(password))
-		_, err := DB.Exec("INSERT INTO users (name, nickname, rate, description, friends, logo, media, region, tags, mail, password) VALUES (" + str + ")")
+		_, err := DB.Exec("INSERT INTO" + " users (name, nickname, rate, description, friends, logo, media, region, tags, mail, password) VALUES (" + str + ")")
 		if err != nil {
 			log.Print(err)
 			c.JSON(500, gin.H{
 				"server": -1,
 			})
+		} else {
+			c.JSON(200, gin.H{
+				"server": 1,
+			})
 		}
-		c.JSON(200, gin.H{
-			"server": 1,
-		})
 	}
 }
 
@@ -62,17 +63,18 @@ func CreateTeam(c *gin.Context) {
 
 	// TODO: check for spam
 
-	str := fmt.Sprintf("\\'%s\\' 0 \\'%s\\' \\'%s\\' \\'%s\\' \\'%s\\' %s \\'%s\\' \\'%s\\'", name, description, rules, "", "", "current_timestamp", place, "{}")
-	_, err := DB.Exec(str)
+	str := fmt.Sprintf("'%s', 0, '%s', '%s', '%s', '%s', %s, '%s', '%s'", name, description, rules, "", "", "current_timestamp", place, "{}")
+	_, err := DB.Exec("INSERT" + " INTO team (name, rate, description, rules, logo, media, reg_date, place, tags) VALUES (" + str + ")")
 	if err != nil {
 		log.Println(err)
 		c.JSON(500, gin.H{
 			"server": -1,
 		})
+	} else {
+		c.JSON(200, gin.H{
+			"server": 1,
+		})
 	}
-	c.JSON(200, gin.H{
-		"server": 1,
-	})
 }
 
 func GetUserByID(c *gin.Context) {
