@@ -1,2 +1,2 @@
-# define-teams
+# define-komandy
 Praying for coffee...
