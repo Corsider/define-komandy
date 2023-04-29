@@ -10,4 +10,7 @@ func InitRouters(r *gin.Engine) {
 	r.GET("/createEvent", CreateEvent)
 
 	r.GET("/getUserByID", GetUserByID)
+	r.GET("/getAllFormats", GetAllFormats)
+	r.GET("/getAllRegions", GetAllRegions)
+	r.GET("/getAllTags", GetAllTags)
 }

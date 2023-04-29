@@ -165,13 +165,65 @@ func CreateEvent(c *gin.Context) {
 }
 
 func GetAllFormats(c *gin.Context) {
-
+	formats := []structs.Format{}
+	rows, err := DB.Query("SELECT * FROM format")
+	if err != nil {
+		log.Println(err)
+		c.JSON(500, gin.H{
+			"server": -1,
+		})
+	} else {
+		for rows.Next() {
+			var form structs.Format
+			_ = rows.Scan(&form.FormatId, &form.Format)
+			formats = append(formats, form)
+		}
+		c.JSON(200, gin.H{
+			"formats": formats,
+		})
+	}
 }
 
 func GetAllRegions(c *gin.Context) {
-
+	regions := []structs.Region{}
+	rows, err := DB.Query("SELECT * FROM region")
+	if err != nil {
+		log.Println(err)
+		c.JSON(500, gin.H{
+			"server": -1,
+		})
+	} else {
+		for rows.Next() {
+			var reg structs.Region
+			_ = rows.Scan(&reg.RegionID, &reg.CountryID, &reg.RegionName)
+			regions = append(regions, reg)
+		}
+		c.JSON(200, gin.H{
+			"regions": regions,
+		})
+	}
 }
 
 func GetAllTags(c *gin.Context) {
+	tags := []structs.Tag{}
+	rows, err := DB.Query("SELECT * FROM tag")
+	if err != nil {
+		log.Println(err)
+		c.JSON(500, gin.H{
+			"server": -1,
+		})
+	} else {
+		for rows.Next() {
+			var tagg structs.Tag
+			_ = rows.Scan(&tagg.TagID, &tagg.Activity, &tagg.GlobalTagID)
+			tags = append(tags, tagg)
+		}
+		c.JSON(200, gin.H{
+			"tag": tags,
+		})
+	}
+}
+
+func GetAllTagsByGlobalTag(c *gin.Context) {
 
 }
