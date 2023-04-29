@@ -6,6 +6,8 @@ import (
 	"gopkg.in/yaml.v3"
 	"log"
 	"os"
+	"strconv"
+	"strings"
 )
 
 func First[T, U any](val T, _ U) T {
@@ -24,4 +26,21 @@ func ReadYaml[T structs.Config | structs.SecretConfig](filename string) (*T, err
 		return nil, fmt.Errorf("error reading %q: %w", filename, err)
 	}
 	return &data, err
+}
+
+func StringToArray(s string) []int {
+	res := strings.Split(s, ",")
+	resint := []int{}
+	for _, elem := range res {
+		resint = append(resint, First(strconv.Atoi(elem)))
+	}
+	return resint
+}
+
+func ArrayToString(a []int) string {
+	res := ""
+	for _, elem := range a {
+		res += strconv.Itoa(elem)
+	}
+	return res
 }

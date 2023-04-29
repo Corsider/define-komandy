@@ -7,6 +7,7 @@ func InitRouters(r *gin.Engine) {
 	r.GET("/ping", Ping)
 	r.GET("/createUser", CreateUser)
 	r.GET("/createTeam", CreateTeam)
+	r.GET("/createEvent", CreateEvent)
 
 	r.GET("/getUserByID", GetUserByID)
 }
