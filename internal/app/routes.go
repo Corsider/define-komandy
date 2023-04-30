@@ -48,7 +48,7 @@ func CreateUser(c *gin.Context) {
 			"server": 0,
 		})
 	} else {
-		str := fmt.Sprintf("'%s', '%s', %d, '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s'",
+		str := fmt.Sprintf("'%s', '%s', %d, '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s'",
 			usr.Name, usr.Nickname, 0, usr.Description, "{}", "", "", usr.RegionID, "{}", usr.Mail, HashPassword(usr.Password))
 		_, err := DB.Exec("INSERT INTO" + " users (name, nickname, rate, description, friends, logo, media, region_id, tags, mail, password) VALUES (" + str + ")")
 		if err != nil {
@@ -249,11 +249,44 @@ func GetAllTags(c *gin.Context) {
 }
 
 func GetAllGlobalTags(c *gin.Context) {
-
+	gtags := []structs.GlobalTag{}
+	rows, err := DB.Query("SELECT * FROM globaltag")
+	if err != nil {
+		log.Println(err)
+		c.JSON(500, gin.H{
+			"server": -1,
+		})
+	} else {
+		for rows.Next() {
+			var tagg structs.GlobalTag
+			_ = rows.Scan(&tagg.GlobalTagID, &tagg.Category)
+			gtags = append(gtags, tagg)
+		}
+		c.JSON(200, gin.H{
+			"globaltag": gtags,
+		})
+	}
 }
 
 func GetAllTagsByGlobalTag(c *gin.Context) {
-
+	gtag := c.Query("globaltag")
+	gtags := []structs.Tag{}
+	rows, err := DB.Query(fmt.Sprintf("SELECT * FROM tag WHERE globaltag_id='%s'", gtag))
+	if err != nil {
+		log.Println(err)
+		c.JSON(500, gin.H{
+			"server": -1,
+		})
+	} else {
+		for rows.Next() {
+			var tg structs.Tag
+			_ = rows.Scan(&tg.TagID, &tg.Activity, &tg.GlobalTagID)
+			gtags = append(gtags, tg)
+		}
+		c.JSON(200, gin.H{
+			"tag": gtags,
+		})
+	}
 }
 
 func GetAllUsers(c *gin.Context) {
@@ -302,21 +335,81 @@ func GetAllEvents(c *gin.Context) {
 	}
 }
 
-//func GetTeamsByUserID(c *gin.Context) {
-//	id := c.Query("id")
-//	rows, err := DB.Query("SELECT * FROM user_team")
-//	if err != nil {
-//		log.Println(err)
-//		c.JSON(500, gin.H{
-//			"server": -1,
-//		})
-//	} else {
-//		for rows.Next() {
-//			var
-//		}
-//	}
-//}
+func GetTeamsByUserID(c *gin.Context) {
+	id := c.Query("id")
+	rows, err := DB.Query(fmt.Sprintf("SELECT team_id FROM user_team WHERE user_id='%s' AND hidden=false", id))
+	if err != nil {
+		log.Println(err)
+		c.JSON(500, gin.H{
+			"server": -1,
+		})
+	} else {
+		ids := []int{}
+		for rows.Next() {
+			var idd int
+			_ = rows.Scan(&idd)
+			ids = append(ids, idd)
+		}
+		c.JSON(200, gin.H{
+			"teams": ids,
+		})
+	}
+}
 
 func GetTeamMembers(c *gin.Context) {
+	id := c.Query("id")
+	rows, err := DB.Query(fmt.Sprintf("SELECT user_id FROM user_team WHERE team_id='%s'", id))
+	if err != nil {
+		log.Println(err)
+		c.JSON(500, gin.H{
+			"server": -1,
+		})
+	} else {
+		members := []int{}
+		for rows.Next() {
+			var member int
+			_ = rows.Scan(&member)
+			members = append(members, member)
+		}
+		c.JSON(200, gin.H{
+			"users": members,
+		})
+	}
+}
 
+func AddUserToTeam(c *gin.Context) {
+	usr_id := c.Query("user_id")
+	team_id := c.Query("team_id")
+	str := fmt.Sprintf("('%s', '%s', %s, 'false')", usr_id, team_id, "current_timestamp")
+	_, err := DB.Exec("INSERT " + "INTO user_team " + "(user_id, team_id, date_of_entry, hidden) VALUES " + str)
+	if err != nil {
+		log.Println(err)
+		c.JSON(500, gin.H{
+			"server": -1,
+		})
+	} else {
+		c.JSON(200, gin.H{
+			"server": 1,
+		})
+	}
+}
+
+func GetAllTeams(c *gin.Context) {
+	teams := []int{}
+	rows, err := DB.Query("SELECT team_id FROM team")
+	if err != nil {
+		log.Println(err)
+		c.JSON(500, gin.H{
+			"server": -1,
+		})
+	} else {
+		for rows.Next() {
+			var tm int
+			_ = rows.Scan(&tm)
+			teams = append(teams, tm)
+		}
+		c.JSON(200, gin.H{
+			"teams": teams,
+		})
+	}
 }
