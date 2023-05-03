@@ -10,7 +10,10 @@ func InitRouters(r *gin.Engine) {
 	r.POST("/createEvent", CreateEvent)
 
 	r.GET("/addUserToTeam", AddUserToTeam)
-	// TODO: removeUserFromTeam
+	// removeUserFromTeam
+	// login (return user_id)
+	r.GET("/login", Login)
+	r.GET("/removeUserFromTeam", RemoveUserFromTeam)
 
 	r.GET("/getUserByID", GetUserByID)
 	r.GET("/getAllFormats", GetAllFormats)

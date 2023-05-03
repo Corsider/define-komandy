@@ -413,3 +413,47 @@ func GetAllTeams(c *gin.Context) {
 		})
 	}
 }
+
+func Login(c *gin.Context) {
+	inputPassword := c.Query("password")
+	mail := c.Query("mail")
+	str := fmt.Sprintf("select password from users where mail='%s'", mail)
+	row := DB.QueryRow(str)
+	var hashedPassword string
+	err := row.Scan(&hashedPassword)
+	if err != nil {
+		log.Println(err)
+		c.JSON(500, gin.H{
+			"server": 0,
+		})
+	} else {
+		if ValidatePassword(hashedPassword, inputPassword) {
+			q := fmt.Sprintf("select user_id from users where mail='%s'", mail)
+			roww := DB.QueryRow(q)
+			var usr structs.User
+			_ = roww.Scan(&usr.UserId, &usr.Name, &usr.Nickname, &usr.Rate, &usr.Description, &usr.Friends,
+				&usr.Logo, &usr.Media, &usr.Mail, &usr.Password, &usr.Tags, &usr.RegionID)
+			usr.Password = ""
+			c.JSON(200, gin.H{
+				"user": usr,
+			})
+		}
+	}
+}
+
+func RemoveUserFromTeam(c *gin.Context) {
+	usr_id := c.Query("user_id")
+	team_id := c.Query("team_id")
+	str := fmt.Sprintf("delete from user_team where user_id='%s' AND team_id='%s'", usr_id, team_id)
+	_, err := DB.Exec(str)
+	if err != nil {
+		log.Println(err)
+		c.JSON(500, gin.H{
+			"server": -1,
+		})
+	} else {
+		c.JSON(200, gin.H{
+			"server": 1,
+		})
+	}
+}
